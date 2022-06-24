@@ -1,14 +1,14 @@
 public class App {
     String objectType;
     int id;
-    int trainingNeeded; // number of TRAINING skills needed to release this application
-    int codingNeeded; // number of CODING skills needed to release this application
-    int dailyRoutineNeeded; // number of DAILY_ROUTINE skills needed to release this application
-    int taskPrioritizationNeeded; // number of TASK_PRIORITIZATION skills needed to release this application
-    int architectureStudyNeeded; // number of ARCHITECTURE_STUDY skills needed to release this application
-    int continuousDeliveryNeeded; // number of CONTINUOUS_DELIVERY skills needed to release this application
-    int codeReviewNeeded; // number of CODE_REVIEW skills needed to release this application
-    int refactoringNeeded; // number of REFACTORING skills needed to release this application
+    int trainingNeeded = 0; // number of TRAINING skills needed to release this application
+    int codingNeeded = 0; // number of CODING skills needed to release this application
+    int dailyRoutineNeeded = 0; // number of DAILY_ROUTINE skills needed to release this application
+    int taskPrioritizationNeeded = 0; // number of TASK_PRIORITIZATION skills needed to release this application
+    int architectureStudyNeeded = 0; // number of ARCHITECTURE_STUDY skills needed to release this application
+    int continuousDeliveryNeeded = 0; // number of CONTINUOUS_DELIVERY skills needed to release this application
+    int codeReviewNeeded = 0; // number of CODE_REVIEW skills needed to release this application
+    int refactoringNeeded = 0; // number of REFACTORING skills needed to release this application
 
     public App(String objectType, int id, int trainingNeeded, int codingNeeded, int dailyRoutineNeeded, int taskPrioritizationNeeded, int architectureStudyNeeded, int continuousDeliveryNeeded, int codeReviewNeeded, int refactoringNeeded) {
         this.objectType = objectType;

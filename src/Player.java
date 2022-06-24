@@ -36,6 +36,7 @@ class Player {
 
                 apps.add(new App(objectType, id, trainingNeeded, codingNeeded, refactoringNeeded));
             }
+
             for (int i = 0; i < 2; i++) {
                 int playerLocation = in.nextInt(); // id of the zone in which the player is located
                 int playerScore = in.nextInt();
@@ -44,6 +45,7 @@ class Player {
 
                 pelaajat.add(new Pelaaja(playerLocation, playerScore, playerPermanentDailyRoutineCards, playerPermanentArchitectureStudyCards));
             }
+
             int cardLocationsCount = in.nextInt();
             for (int i = 0; i < cardLocationsCount; i++) {
                 String cardsLocation = in.next(); // the location of the card list. It can be HAND, DRAW, DISCARD or OPPONENT_CARDS (AUTOMATED and OPPONENT_AUTOMATED will appear in later leagues)
@@ -75,21 +77,21 @@ class Player {
                 possibleMoves[i] = possibleMove;
             }
 
-            if (gamePhase.equals(GamePhase.MOVE)){
+            if (gamePhase.equals(GamePhase.MOVE)) {
                 System.err.println("MOVE phase");
                 int bestMoveIndex = chooseBestMove(pelaajat, apps, cardLocations, possibleMoves);
                 System.out.println(possibleMoves[bestMoveIndex]);
 
-            } else if (gamePhase.equals(GamePhase.GIVE_CARD)){
+            } else if (gamePhase.equals(GamePhase.GIVE_CARD)) {
                 System.err.println("GIVE_CARD phase");
 
-            } else if (gamePhase.equals(GamePhase.THROW_CARD)){
+            } else if (gamePhase.equals(GamePhase.THROW_CARD)) {
                 System.err.println("THROW_CARD phase");
 
-            } else if (gamePhase.equals(GamePhase.PLAY_CARD)){
+            } else if (gamePhase.equals(GamePhase.PLAY_CARD)) {
                 System.err.println("PLAY_CARD phase");
 
-            } else if (gamePhase.equals(GamePhase.RELEASE)){
+            } else if (gamePhase.equals(GamePhase.RELEASE)) {
                 System.err.println("RELEASE phase");
                 int bestReleaseIndex = chooseBestRelease(pelaajat, apps, cardLocations, possibleMoves);
                 System.out.println(possibleMoves[bestReleaseIndex]);
@@ -100,23 +102,50 @@ class Player {
         }
     }
 
-    public static int chooseBestRelease(List<Pelaaja> pelaajat, List<App> apps, List<CardLocation> cardLocations, String[] possibleMoves){
-        int bestReleaseIndex = 0;
+    public static int chooseBestRelease(List<Pelaaja> pelaajat, List<App> apps, List<CardLocation> cardLocations, String[] possibleMoves) {
+        System.err.println("chooseBestRelease");
+        int bestMoveIndex = 0; // release
         int bestReleaseScore = 0;
-        for (int i = 0; i < possibleMoves.length; i++) {
-            String possibleMove = possibleMoves[i];
+        for (String s : possibleMoves) {
+            int releaseScore = 0;
+            String possibleMove = s;
             String[] possibleMoveSplit = possibleMove.split(" ");
-            if (possibleMoveSplit[0].equals("RELEASE")){
-                int possibleReleaseId = Integer.parseInt(possibleMoveSplit[1]);
-                int possibleReleaseScore = apps.get(possibleReleaseId).getTrainingNeeded() + apps.get(possibleReleaseId).getCodingNeeded() + apps.get(possibleReleaseId).getDailyRoutineNeeded() + apps.get(possibleReleaseId).getTaskPrioritizationNeeded() + apps.get(possibleReleaseId).getArchitectureStudyNeeded() + apps.get(possibleReleaseId).getContinuousDeliveryNeeded() + apps.get(possibleReleaseId).getCodeReviewNeeded() + apps.get(possibleReleaseId).getRefactoringNeeded();
-                if (possibleReleaseScore > bestReleaseScore){
-                    bestReleaseIndex = i;
-                    bestReleaseScore = possibleReleaseScore;
+            System.err.println("possibleMove " + possibleMove);
+            if (possibleMoveSplit[0].equals("RELEASE")) {
+                for (App app : apps) {
+                    if (app.getId() == Integer.parseInt(possibleMoveSplit[1])) {
+                        for (CardLocation cardLocation : cardLocations) {
+                            if (cardLocation.getCardsLocation().equals("HAND")) {
+
+                                if (app.getCodingNeeded() != 0 && cardLocation.getCodingCardsCount() > 0) {
+                                    if (app.getCodingNeeded() <= cardLocation.getCodingCardsCount()) {
+                                        releaseScore += 1;
+                                    }
+                                    if (app.getTrainingNeeded() != 0 && cardLocation.getTrainingCardsCount() > 0) {
+                                        if (app.getTrainingNeeded() <= cardLocation.getTrainingCardsCount()) {
+                                            releaseScore += 1;
+                                        }
+                                        if (app.getRefactoringNeeded() != 0 && cardLocation.getRefactoringCardsCount() > 0) {
+                                            if (app.getRefactoringNeeded() <= cardLocation.getRefactoringCardsCount()) {
+                                                releaseScore += 1;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (releaseScore > bestReleaseScore) {
+                            bestMoveIndex = Integer.parseInt(possibleMoveSplit[1]);
+                            bestReleaseScore = releaseScore;
+                        }
+                    }
                 }
+
             }
         }
-        return bestReleaseIndex;
+        return apps[bestMoveIndex].getId();
     }
+
 
     private static int chooseBestMove(List<Pelaaja> pelaajat, List<App> apps, List<CardLocation> cardLocations, String[] possibleMoves) {
         Pelaaja pelaaja = pelaajat.get(0);
@@ -140,7 +169,8 @@ class Player {
 
     }
 
-    private static int moveScore(Pelaaja pelaaja, List<App> apps, List<CardLocation> cardLocations, String[] move) {
+    private static int moveScore(Pelaaja
+                                         pelaaja, List<App> apps, List<CardLocation> cardLocations, String[] move) {
         int moveScore = 0;
         int moveZoneId = Integer.parseInt(move[1]);
         for (App app : apps) {
