@@ -19,10 +19,8 @@ class Player {
             List<Pelaaja> pelaajat = new ArrayList<Pelaaja>();
             List<CardLocation> cardLocations = new ArrayList<CardLocation>();
 
-            String gamePhase = in.next(); // can be MOVE, GIVE_CARD, THROW_CARD, PLAY_CARD or RELEASE
-            GamePhase gamePhaseEnum = GamePhase.fromString(gamePhase);
+            GamePhase gamePhase = GamePhase.fromString(in.next()); // can be MOVE, GIVE_CARD, THROW_CARD, PLAY_CARD or RELEASE
 
-            System.err.println("gamePhase " + gamePhase);
             int applicationsCount = in.nextInt();
             for (int i = 0; i < applicationsCount; i++) {
                 String objectType = in.next();
@@ -67,16 +65,111 @@ class Player {
             if (in.hasNextLine()) {
                 in.nextLine();
             }
+
+            //Array of strings possibleMove
+            String[] possibleMoves = new String[possibleMovesCount];
+
             for (int i = 0; i < possibleMovesCount; i++) {
                 String possibleMove = in.nextLine();
                 System.err.println("possibleMove " + possibleMove);
+                possibleMoves[i] = possibleMove;
             }
 
- 
+            if (gamePhase.equals(GamePhase.MOVE)){
+                System.err.println("MOVE phase");
+                int bestMoveIndex = chooseBestMove(pelaajat, apps, cardLocations, possibleMoves);
+                System.out.println(possibleMoves[bestMoveIndex]);
 
+            } else if (gamePhase.equals(GamePhase.GIVE_CARD)){
+                System.err.println("GIVE_CARD phase");
+
+            } else if (gamePhase.equals(GamePhase.THROW_CARD)){
+                System.err.println("THROW_CARD phase");
+
+            } else if (gamePhase.equals(GamePhase.PLAY_CARD)){
+                System.err.println("PLAY_CARD phase");
+
+            } else if (gamePhase.equals(GamePhase.RELEASE)){
+                System.err.println("RELEASE phase");
+                int bestReleaseIndex = chooseBestRelease(pelaajat, apps, cardLocations, possibleMoves);
+                System.out.println(possibleMoves[bestReleaseIndex]);
+            }
 
             // In the first league: RANDOM | MOVE <zoneId> | RELEASE <applicationId> | WAIT; In later leagues: | GIVE <cardType> | THROW <cardType> | TRAINING | CODING | DAILY_ROUTINE | TASK_PRIORITIZATION <cardTypeToThrow> <cardTypeToTake> | ARCHITECTURE_STUDY | CONTINUOUS_DELIVERY <cardTypeToAutomate> | CODE_REVIEW | REFACTORING;
 
         }
     }
+
+    //method to chooseBestrelease
+    public static int chooseBestRelease(List<Pelaaja> pelaajat, List<App> apps, List<CardLocation> cardLocations, String[] possibleMoves){
+        int bestReleaseIndex = 0;
+        int bestReleaseScore = 0;
+        for (int i = 0; i < possibleMoves.length; i++) {
+            String possibleMove = possibleMoves[i];
+            String[] possibleMoveSplit = possibleMove.split(" ");
+            if (possibleMoveSplit[0].equals("RELEASE")){
+                int possibleReleaseId = Integer.parseInt(possibleMoveSplit[1]);
+                int possibleReleaseScore = apps.get(possibleReleaseId).getTrainingNeeded() + apps.get(possibleReleaseId).getCodingNeeded() + apps.get(possibleReleaseId).getDailyRoutineNeeded() + apps.get(possibleReleaseId).getTaskPrioritizationNeeded() + apps.get(possibleReleaseId).getArchitectureStudyNeeded() + apps.get(possibleReleaseId).getContinuousDeliveryNeeded() + apps.get(possibleReleaseId).getCodeReviewNeeded() + apps.get(possibleReleaseId).getRefactoringNeeded();
+                if (possibleReleaseScore > bestReleaseScore){
+                    bestReleaseIndex = i;
+                    bestReleaseScore = possibleReleaseScore;
+                }
+            }
+        }
+        return bestReleaseIndex;
+    }
+
+    private static int chooseBestMove(List<Pelaaja> pelaajat, List<App> apps, List<CardLocation> cardLocations, String[] possibleMoves) {
+        Pelaaja pelaaja = pelaajat.get(0);
+        int bestMovesIndex = 0;
+        int bestMovesScore = 0;
+        for (int i = 0; i < possibleMoves.length; i++) {
+            String possibleMove = possibleMoves[i];
+            String[] move = possibleMove.split(" ");
+            if (move[0].equals("MOVE")) {
+                int moveScore = moveScore(pelaaja, apps, cardLocations, move);
+                if (moveScore > bestMovesScore) {
+                    bestMovesIndex = i;
+                    bestMovesScore = moveScore;
+                }
+            }
+        }
+
+        System.err.println("bestMovesIndex " + bestMovesIndex);
+        System.err.println("bestMovesScore " + bestMovesScore);
+        return bestMovesIndex;
+
+    }
+
+    private static int moveScore(Pelaaja pelaaja, List<App> apps, List<CardLocation> cardLocations, String[] move) {
+        int moveScore = 0;
+        int moveZoneId = Integer.parseInt(move[1]);
+        for (App app : apps) {
+            if (app.getId() == moveZoneId) {
+                moveScore += app.getTrainingNeeded();
+                moveScore += app.getCodingNeeded();
+                moveScore += app.getDailyRoutineNeeded();
+                moveScore += app.getTaskPrioritizationNeeded();
+                moveScore += app.getArchitectureStudyNeeded();
+                moveScore += app.getContinuousDeliveryNeeded();
+                moveScore += app.getCodeReviewNeeded();
+                moveScore += app.getRefactoringNeeded();
+            }
+        }
+        for (CardLocation cardLocation : cardLocations) {
+            if (cardLocation.getCardsLocation().equals("HAND")) {
+                moveScore += cardLocation.getTrainingCardsCount();
+                moveScore += cardLocation.getCodingCardsCount();
+                moveScore += cardLocation.getDailyRoutineCardsCount();
+                moveScore += cardLocation.getTaskPrioritizationCardsCount();
+                moveScore += cardLocation.getArchitectureStudyCardsCount();
+                moveScore += cardLocation.getContinuousDeliveryCardsCount();
+                moveScore += cardLocation.getCodeReviewCardsCount();
+                moveScore += cardLocation.getRefactoringCardsCount();
+            }
+        }
+        return moveScore;
+    }
+
+
 }
