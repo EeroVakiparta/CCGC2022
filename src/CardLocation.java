@@ -26,6 +26,11 @@ public class CardLocation {
         this.technicalDebtCardsCount = technicalDebtCardsCount;
     }
 
+    // boolean is HAND
+    public boolean isHand(){
+        return cardsLocation.equals("HAND");
+    }
+
     public String getCardsLocation() {
         return cardsLocation;
     }
