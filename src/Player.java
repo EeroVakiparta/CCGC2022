@@ -100,7 +100,6 @@ class Player {
         }
     }
 
-    //method to chooseBestrelease
     public static int chooseBestRelease(List<Pelaaja> pelaajat, List<App> apps, List<CardLocation> cardLocations, String[] possibleMoves){
         int bestReleaseIndex = 0;
         int bestReleaseScore = 0;
